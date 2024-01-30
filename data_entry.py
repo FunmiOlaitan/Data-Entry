@@ -13,3 +13,20 @@ def display_details(details):
     for key, value in details.items():
         print("f'{key}:{value}")
 
+def save_membership(memberships):
+    with open("membership_details", "w") as file:
+        json.dump(memberships, file)
+
+def load_from_file():
+    try:
+        with open("membership_details.json", "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+    
+def search_member(memberships, query):
+    for member in memberships:
+        if query.lower() in member["Name"].lower() or query.lower() in member["Email"].lower():
+            return member
+    return None
+
