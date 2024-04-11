@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import json
 
-class RockclimbingClub:
+class RockClimbingClub:
     def __init__(self):
         self.memberships = []
     
@@ -14,7 +14,7 @@ class RockclimbingClub:
         }
         self.memberships.append(membership)
     
-    def get_memebership_details(self):
+    def get_membership_details(self):
         return self.memberships
     
     def save_to_file(self, filename='member_details.json'):
@@ -24,8 +24,33 @@ class RockclimbingClub:
     def load_from_file(self, filename='member_details.json'):
         try:
             with open(filename, 'r') as file:
-                self.memebrships = json.load(file)
+                self.memberships = json.load(file)
         except FileNotFoundError:
             print("File not found.")
 
+class MembershipGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Rock Climbing Club Membership Database")
+        self.climbing_club = RockClimbingClub()
+
+        # Entry Frame
+        self.entry_frame = ttk.LabelFrame(root, text="Add Membership Details")
+        self.entry_frame.grid(row=0, column=0, padx = 10, pady=10, sticky="nsew")
+
+        self.name_label = ttk.Label(self.entry_frame, text="Name:")
+        self.name_entry = ttk.Entry(self.entry_frame)
+
+        self.age_label = ttk.Label(self.entry_frame, text="Age:")
+        self.age_entry = ttk.Entry(self.entry_frame)
+
+        self.email_label = ttk.Label(self.entry_frame, text="Email:")
+        self.email_entry = ttk.Entry(self.entry_frame)
+
+        self.add_button = ttk.Button(self.entry_frame, text="Add Membership")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = MembershipGUI(root)
+    root.mainloop()
 
