@@ -48,6 +48,13 @@ class MembershipGUI:
         self.email_entry = ttk.Entry(self.entry_frame)
 
         self.add_button = ttk.Button(self.entry_frame, text="Add Membership")
+        
+        # Display Frame 
+        self.display_frame = ttk.LabelFrame(root, text = "Display Memberships")
+        self.display_frame.grid(row=1, column=0, padx = 10, pady = 10, sticky ="nsew" )
+
+        self.display_text = tk.Text(self.display_frame, height= 10, width= 50, state="disabled" )
+        self.display_text.grid(row=0, column=0, padx= 10, pady =10)
 
 if __name__ == "__main__":
     root = tk.Tk()
