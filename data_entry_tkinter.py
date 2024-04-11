@@ -1,33 +1,26 @@
 import tkinter as tk
 from tkinter import ttk
-import json
+import sqlite3
 
 class RockClimbingClub:
     def __init__(self):
-        self.memberships = []
-    
-    def add_memebership_details(self, name, age, email):
-        membership = {
-            'Name': name,
-            'Age': age,
-            'Email': email
-        }
-        self.memberships.append(membership)
-    
-    def get_membership_details(self):
-        return self.memberships
-    
-    def save_to_file(self, filename='member_details.json'):
-        with open(filename, 'w') as file:
-            json.dump(self.memberships, file)
-    
-    def load_from_file(self, filename='member_details.json'):
-        try:
-            with open(filename, 'r') as file:
-                self.memberships = json.load(file)
-        except FileNotFoundError:
-            print("File not found.")
+        self.conn = sqlite3.connect("membership.db") # connection to SQLite database memebrships.db
+        self.create_table() # method to create table
 
+    def create_table(self):   #create table in database
+        c = self.conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS memberships (id INTEGER PRIMARY KEY, name TEXT, age INTEGER, email TEXT)''')
+        self.conn.commit()
+   
+    def add_membership_details(self, name, age, email):
+        c = self.conn.cursor()
+        c.execute ("INSERT INTO memberships (name, age, email) VLAUES (?,?,?)", (name, age, email))
+        self.conn.commit()
+
+    def get_membership_details(self):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM memberships")
+        return c.fetchall()
 class MembershipGUI:
     def __init__(self, root):
         self.root = root
