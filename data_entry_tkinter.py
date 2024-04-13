@@ -4,23 +4,23 @@ import sqlite3
 
 class RockClimbingClub:
     def __init__(self):
-        self.conn = sqlite3.connect("membership.db") # connection to SQLite database memebrships.db
+        self.conn = sqlite3.connect("membership.db") # connection to SQLite database membership.db
         self.create_table() # method to create table
 
-    def create_table(self):   #create table in database
+    def create_table(self):   # create table in database
         c = self.conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS memberships (id INTEGER PRIMARY KEY, name TEXT, age INTEGER, email TEXT)''')
         self.conn.commit()
    
-    def add_membership_details(self, name, age, email):
+    def add_membership(self, name, age, email): # adds new membership
         c = self.conn.cursor()
-        c.execute ("INSERT INTO memberships (name, age, email) VLAUES (?,?,?)", (name, age, email))
-        self.conn.commit()
+        c.execute ("INSERT INTO memberships (name, age, email) VALUES (?,?,?)", (name, age, email)) #adds new rows to membership table
+        self.conn.commit()  # commit changes to database
 
-    def get_membership_details(self):
+    def get_membership_details(self):  # retrieves all methods
         c = self.conn.cursor()
-        c.execute("SELECT * FROM memberships")
-        return c.fetchall()
+        c.execute("SELECT * FROM memberships") # selects all column
+        return c.fetchall() # fetch rows and return as tuple
 class MembershipGUI:
     def __init__(self, root):
         self.root = root
@@ -40,7 +40,7 @@ class MembershipGUI:
         self.email_label = ttk.Label(self.entry_frame, text="Email:")
         self.email_entry = ttk.Entry(self.entry_frame)
 
-        self.add_button = ttk.Button(self.entry_frame, text="Add Membership")
+        self.add_button = ttk.Button(self.entry_frame, text="Add Membership", command=self.add_membership)
         
         # Display Frame
         self.display_frame = ttk.LabelFrame(root, text = "Display Memberships")
@@ -53,8 +53,58 @@ class MembershipGUI:
         self.menu_frame = ttk.LabelFrame(root, text = "Menu")
         self.menu_frame.grid(row=2, column=0, padx = 10, pady =10, sticky = "nsew")
         
-        self.save_button = ttk.Button(self.menu_frame)
-        self.load_button = ttk.Button(self.menu_frame)
+        # self.save_button = ttk.Button(self.menu_frame, text="Save to File")
+        # self.load_button = ttk.Button(self.menu_frame, text="Load from File")
+
+        # Grid config
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(0, weight=1)
+        self.root.columnconfigure(1, weight=1)
+        self.root.columnconfigure(2, weight=1)
+
+        self.entry_frame.columnconfigure(1, weight=1)
+        self.display_frame.columnconfigure(0, weight=1)
+
+        # Grid placement
+        self.name_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.name_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.age_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.age_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.email_label.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.email_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
+        self.add_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+        self.display_text.grid(row=0, column=0)
+        # self.save_button.grid(row=0, column=0, padx=5, pady=5)
+        # self.load_button.grid(row=0, column=1, padx=5, pady=5)
+
+    def add_membership(self):
+        name = self.name_entry.get()
+        age = self.age_entry.get()
+        email = self.email_entry.get()
+
+        self.climbing_club.add_membership(name, age, email)
+        self.display_membership_details()
+        self.clear_entry_fields()
+    
+    def display_membership_details(self):
+        memberships = self.climbing_club.get_membership_details()
+        self.display_text.config(state="normal")
+        self.display_text.delete("1.0", tk.END)
+
+        for member in memberships:
+            self.display_text.insert(tk.END, f"Name: {member[1]}\n")
+            self.display_text.insert(tk.END, f"Age: {member[2]}\n")
+            self.display_text.insert(tk.END, f"Email: {member[3]}\n")
+        
+        self.display_text.config(state="disabled")
+
+    
+    def clear_entry_fields(self):
+        self.name_entry.delete(0, tk.END)
+        self.age_entry.delete(0, tk.END)
+        self.email_entry.delete(0, tk.END)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
