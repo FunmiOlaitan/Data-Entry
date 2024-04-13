@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import sqlite3
+import re
 
 class RockClimbingClub:
     def __init__(self):
@@ -9,7 +10,12 @@ class RockClimbingClub:
 
     def create_table(self):   # create table in database
         c = self.conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS memberships (id INTEGER PRIMARY KEY, name TEXT, age INTEGER, email TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS memberships (
+                  id INTEGER PRIMARY KEY, 
+                  name TEXT, 
+                  age INTEGER, 
+                  email TEXT
+                  )''')
         self.conn.commit()
    
     def add_membership(self, name, age, email): # adds new membership
@@ -56,12 +62,8 @@ class MembershipGUI:
         # self.save_button = ttk.Button(self.menu_frame, text="Save to File")
         # self.load_button = ttk.Button(self.menu_frame, text="Load from File")
 
-        # Grid config
+        # Grid configuration of columns when window is resized 
         self.root.columnconfigure(0, weight=1)
-        self.root.columnconfigure(0, weight=1)
-        self.root.columnconfigure(1, weight=1)
-        self.root.columnconfigure(2, weight=1)
-
         self.entry_frame.columnconfigure(1, weight=1)
         self.display_frame.columnconfigure(0, weight=1)
 
@@ -78,26 +80,49 @@ class MembershipGUI:
         # self.save_button.grid(row=0, column=0, padx=5, pady=5)
         # self.load_button.grid(row=0, column=1, padx=5, pady=5)
 
-    def add_membership(self):
-        name = self.name_entry.get()
+    def add_membership(self): 
+        name = self.name_entry.get() # gets text entered by user
         age = self.age_entry.get()
         email = self.email_entry.get()
 
-        self.climbing_club.add_membership(name, age, email)
-        self.display_membership_details()
-        self.clear_entry_fields()
+        # data validation
+        if self.validate_input(name, age, email):
+            self.climbing_club.add_membership(name, age, email)  # passes the values entered to the method and add the details to the db
+            self.display_membership_details() # calls display membership details method to fetch all membership details
+            self.clear_entry_fields()  # to clear text entry fields
+        else:
+            tk.messagebox.showerror("Invalid input provided.")
     
+    def validate_input(self, name, age, email):
+        # name should not be empty
+        if not name:
+            return False
+        
+        # age should be positive int
+        try: 
+            age = int(age)
+            if age <= 0:
+                return False
+        except ValueError:
+            return False
+        
+        # email should be in valid format
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return False
+        
+        return True
+
     def display_membership_details(self):
-        memberships = self.climbing_club.get_membership_details()
-        self.display_text.config(state="normal")
+        memberships = self.climbing_club.get_membership_details() # calls get_memebrship_details to retrieve all membership details in tuples
+        self.display_text.config(state="normal") 
         self.display_text.delete("1.0", tk.END)
 
-        for member in memberships:
+        for member in memberships: # iterates over each memebrship
             self.display_text.insert(tk.END, f"Name: {member[1]}\n")
             self.display_text.insert(tk.END, f"Age: {member[2]}\n")
             self.display_text.insert(tk.END, f"Email: {member[3]}\n")
         
-        self.display_text.config(state="disabled")
+        self.display_text.config(state="disabled") # preventing modification by user 
 
     
     def clear_entry_fields(self):
