@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import tkinter.messagebox as messagebox
 import sqlite3
 import re
 
@@ -27,6 +28,11 @@ class RockClimbingClub:
         c = self.conn.cursor()
         c.execute("SELECT * FROM memberships") # selects all column
         return c.fetchall() # fetch rows and return as tuple
+    
+    def clear_all_memberships(self):
+        c =self.conn.cursor()
+        c.execute("DELETE FROM memberships")
+        self.conn.commit()
 class MembershipGUI:
     def __init__(self, root):
         self.root = root
@@ -58,9 +64,14 @@ class MembershipGUI:
         # Menu Frame
         self.menu_frame = ttk.LabelFrame(root, text = "Menu")
         self.menu_frame.grid(row=2, column=0, padx = 10, pady =10, sticky = "nsew")
-        
-        # self.save_button = ttk.Button(self.menu_frame, text="Save to File")
-        # self.load_button = ttk.Button(self.menu_frame, text="Load from File")
+
+        self.view_all_button = ttk.Button(self.menu_frame, text="View all", command=self.display_membership_details)
+        self.clear_all_button = ttk.Button(self.menu_frame, text="Clear all", command=self.clear_all_memberships)
+
+        # Grid placement for menu buttons
+        self.view_all_button.grid(row=0, column=0, padx=5, pady=5)
+        self.clear_all_button.grid(row=0, column=2, padx=5, pady=5)
+
 
         # Grid configuration of columns when window is resized 
         self.root.columnconfigure(0, weight=1)
@@ -77,8 +88,6 @@ class MembershipGUI:
         self.add_button.grid(row=3, column=0, columnspan=2, pady=10)
 
         self.display_text.grid(row=0, column=0)
-        # self.save_button.grid(row=0, column=0, padx=5, pady=5)
-        # self.load_button.grid(row=0, column=1, padx=5, pady=5)
 
     def add_membership(self): 
         name = self.name_entry.get() # gets text entered by user
@@ -88,10 +97,10 @@ class MembershipGUI:
         # data validation
         if self.validate_input(name, age, email):
             self.climbing_club.add_membership(name, age, email)  # passes the values entered to the method and add the details to the db
-            self.display_membership_details() # calls display membership details method to fetch all membership details
             self.clear_entry_fields()  # to clear text entry fields
+            tk.messagebox.showinfo("Success", "Membership successfully added!")
         else:
-            tk.messagebox.showerror("Invalid input provided.")
+            tk.messagebox.showerror("Error", "Invalid input!")
     
     def validate_input(self, name, age, email):
         # name should not be empty
@@ -129,6 +138,13 @@ class MembershipGUI:
         self.name_entry.delete(0, tk.END)
         self.age_entry.delete(0, tk.END)
         self.email_entry.delete(0, tk.END)
+
+    def clear_all_memberships(self):
+        self.climbing_club.clear_all_memberships()
+        self.name_entry.config(state="normal")
+        self.age_entry.delete(0, tk.END)
+        self.email_entry.config(state="disabled")
+        self.display_membership_details()
 
 
 if __name__ == "__main__":
