@@ -108,7 +108,7 @@ class MembershipGUI:
             self.membership_type_combobox.set("")
             tk.messagebox.showinfo("Success", "Membership successfully added!")
         else:
-            tk.messagebox.showerror("Error", "Invalid input!")
+            tk.messagebox.showerror("Error", "Invalid input! Please try agaain.")
     
     def validate_input(self, username, age, email):
         # username should not be empty
@@ -134,26 +134,29 @@ class MembershipGUI:
         self.display_text.config(state="normal") 
         self.display_text.delete("1.0", tk.END)
 
-        for member in memberships: # iterates over each memebrship
-            self.display_text.insert(tk.END, f"Username: {member[1]}\n")
-            self.display_text.insert(tk.END, f"Age: {member[2]}\n")
-            self.display_text.insert(tk.END, f"Email: {member[3]}\n")
+        if memberships:
+            for member in memberships: # iterates over each memebrship
+                self.display_text.insert(tk.END, f"Username: {member[1]}\n")
+                self.display_text.insert(tk.END, f"Age: {member[2]}\n")
+                self.display_text.insert(tk.END, f"Email: {member[3]}\n")
+        else:
+            self.display_text.insert(tk.END, "No membership found.")
         
         self.display_text.config(state="disabled") # preventing modification by user 
 
-    
     def clear_entry_fields(self):
         self.username_entry.delete(0, tk.END)
         self.age_entry.delete(0, tk.END)
         self.email_entry.delete(0, tk.END)
 
     def clear_all_memberships(self):
-        self.climbing_club.clear_all_memberships()
-        self.username_entry.config(state="normal")
-        self.age_entry.delete(0, tk.END)
-        self.email_entry.config(state="disabled")
-        self.display_membership_details()
-
+        if tk.messagebox.askyesno("Confirm", "Are you sure you want to clear all memberships?"):
+            self.climbing_club.clear_all_memberships()
+            self.username_entry.config(state="normal")
+            self.age_entry.delete(0, tk.END)
+            self.email_entry.config(state="disabled")
+            self.display_membership_details()
+            tk.messagebox.showinfo("Success", "All memberships cleared successfully!")
 
 if __name__ == "__main__":
     root = tk.Tk()
