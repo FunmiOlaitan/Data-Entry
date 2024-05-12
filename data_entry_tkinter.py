@@ -108,8 +108,11 @@ class MembershipGUI:
             self.membership_type_combobox.set("")
             tk.messagebox.showinfo("Success", "Membership successfully added!")
         else:
-            tk.messagebox.showerror("Error", "Invalid input! Please try agaain.")
-    
+            if int(age) < 18:
+                tk.messagebox.showerror("Error", "You must be at least 18 years old to join the club.")
+            else:
+                tk.messagebox.showerror("Error", "Invalid input! Please try again.")
+        
     def validate_input(self, username, age, email):
         # username should not be empty
         if not username:
@@ -118,7 +121,7 @@ class MembershipGUI:
         # age should be positive int
         try: 
             age = int(age)
-            if age <= 0:
+            if age <= 0 or age < 18:
                 return False
         except ValueError:
             return False
@@ -151,12 +154,15 @@ class MembershipGUI:
 
     def clear_all_memberships(self):
         if tk.messagebox.askyesno("Confirm", "Are you sure you want to clear all memberships?"):
-            self.climbing_club.clear_all_memberships()
-            self.username_entry.config(state="normal")
-            self.age_entry.delete(0, tk.END)
-            self.email_entry.config(state="disabled")
-            self.display_membership_details()
-            tk.messagebox.showinfo("Success", "All memberships cleared successfully!")
+            if self.climbing_club.get_membership_details():
+                self.climbing_club.clear_all_memberships()
+                self.clear_entry_fields()  # Clear all entry fields
+                self.email_entry.config(state="normal")  # Re-enable email entry
+                self.membership_type_combobox.set("")  # Reset membership type combobox
+                self.display_membership_details()
+                tk.messagebox.showinfo("Success", "All memberships cleared successfully!")
+            else:
+                tk.messagebox.showinfo("Info", "No memberships to clear.")
 
 if __name__ == "__main__":
     root = tk.Tk()
