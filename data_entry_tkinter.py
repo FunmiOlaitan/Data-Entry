@@ -3,11 +3,15 @@ from tkinter import ttk
 import tkinter.messagebox as messagebox
 import sqlite3
 import re
-
+import shutil
+from datetime import datetime
+import os
 class RockClimbingClub:
     def __init__(self):
         self.conn = sqlite3.connect("membership.db") # connection to SQLite database membership.db
         self.create_table() # method to create table
+        self.backup_interval = 24 * 60 * 60 # backup every 24 hours (seconds)
+        self.last_backup_time = datetime.now()
 
     def create_table(self):   # create table in database
         c = self.conn.cursor()
@@ -35,6 +39,14 @@ class RockClimbingClub:
         c.execute("DELETE FROM memberships")
         self.conn.commit()
     
+    def backup_database(self):
+        backup_dir = "backup"
+        backup_file = f"membership_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+        if not os.path.exists(backup_dir):
+            os.makedirs(backup_dir)
+        shutil.copyfile("membership.db", os.path.join(backup_dir, backup_file))
+        self.last_backup_time = datetime.now()
+
     def create_views(self):
         c = self.conn.cursor()
 
@@ -81,6 +93,7 @@ class MembershipGUI:
         self.root = root
         self.root.title("Rock Climbing Club Membership Database")
         self.climbing_club = RockClimbingClub()
+        self.schedule_backup()
 
         # Entry Frame
         self.entry_frame = ttk.LabelFrame(root, text="Add Membership Details")
@@ -205,6 +218,10 @@ class MembershipGUI:
                 tk.messagebox.showinfo("Success", "All memberships cleared successfully!")
             else:
                 tk.messagebox.showinfo("Info", "No memberships to clear.")
+
+    def schedule_backup(self):
+        self.climbing_club.backup_database()
+        self.root.after(self.climbing_club.backup_interval * 1000, self.schedule_backup)
 
 if __name__ == "__main__":
     root = tk.Tk()
