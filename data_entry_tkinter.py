@@ -7,6 +7,7 @@ import shutil
 from datetime import datetime
 import os
 import logging
+import matplotlib.pyplot as plt
 class RockClimbingClub:
     def __init__(self):
         self.conn = sqlite3.connect("membership.db") # connection to SQLite database membership.db
@@ -247,7 +248,18 @@ if __name__ == "__main__":
     print("Average Age of Members:", average_age)
 
     membership_type_counts = climbing_club.get_membership_type_counts()
-    print("Membership Type Counts:", membership_type_counts)#
+    print("Membership Type Counts:", membership_type_counts)
+
+    # visulaise membership type counts
+    types = [m[0] for m in membership_type_counts]
+    counts = [m[1] for m in membership_type_counts]
+    plt.figure(figsize=(8,6))
+    plt.bar(types, counts)
+    plt.title ("Membership Type Counts")
+    plt.xlabel("Membership Type")
+    plt.ylabel("Count")
+    plt.savefig("membership_type_counts_plot.png") #save the plot as an image file
+    plt.show()
 
     latest_members = climbing_club.get_latest_memebrs()
     print("Latest Members:")
