@@ -6,6 +6,7 @@ import re
 import shutil
 from datetime import datetime
 import os
+import logging
 class RockClimbingClub:
     def __init__(self):
         self.conn = sqlite3.connect("membership.db") # connection to SQLite database membership.db
@@ -28,6 +29,7 @@ class RockClimbingClub:
         c = self.conn.cursor()
         c.execute ("INSERT INTO memberships (username, age, email, membership_type) VALUES (?,?,?,?)", (username, age, email, membership_type)) #adds new rows to membership table
         self.conn.commit()  # commit changes to database
+        logging.info('New membership added: Username - %s, Age - %s, Email - %s', username, age, email)
 
     def get_membership_details(self):  # retrieves all methods
         c = self.conn.cursor()
@@ -38,6 +40,7 @@ class RockClimbingClub:
         c =self.conn.cursor()
         c.execute("DELETE FROM memberships")
         self.conn.commit()
+        logging.info('All memberships cleared from the database')
     
     def backup_database(self):
         backup_dir = "backup"
@@ -224,6 +227,7 @@ class MembershipGUI:
         self.root.after(self.climbing_club.backup_interval * 1000, self.schedule_backup)
 
 if __name__ == "__main__":
+    logging.basicConfig(filename='membership.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     root = tk.Tk()
     app = MembershipGUI(root)
     root.mainloop()
