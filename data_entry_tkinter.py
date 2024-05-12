@@ -13,15 +13,16 @@ class RockClimbingClub:
         c = self.conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS memberships (
                   id INTEGER PRIMARY KEY, 
-                  name TEXT, 
+                  username TEXT, 
                   age INTEGER, 
-                  email TEXT
+                  email TEXT,
+                  membership_type TEXT
                   )''')
         self.conn.commit()
    
-    def add_membership(self, name, age, email): # adds new membership
+    def add_membership(self, username, age, email, memebership_type): # adds new membership
         c = self.conn.cursor()
-        c.execute ("INSERT INTO memberships (name, age, email) VALUES (?,?,?)", (name, age, email)) #adds new rows to membership table
+        c.execute ("INSERT INTO memberships (username, age, email, membership_type) VALUES (?,?,?,?)", (username, age, email, memebership_type)) #adds new rows to membership table
         self.conn.commit()  # commit changes to database
 
     def get_membership_details(self):  # retrieves all methods
@@ -43,14 +44,17 @@ class MembershipGUI:
         self.entry_frame = ttk.LabelFrame(root, text="Add Membership Details")
         self.entry_frame.grid(row=0, column=0, padx = 10, pady=10, sticky="nsew")
 
-        self.name_label = ttk.Label(self.entry_frame, text="Name:")
-        self.name_entry = ttk.Entry(self.entry_frame)
+        self.username_label = ttk.Label(self.entry_frame, text="Username:")
+        self.username_entry = ttk.Entry(self.entry_frame)
 
         self.age_label = ttk.Label(self.entry_frame, text="Age:")
         self.age_entry = ttk.Entry(self.entry_frame)
 
         self.email_label = ttk.Label(self.entry_frame, text="Email:")
         self.email_entry = ttk.Entry(self.entry_frame)
+
+        self.membership_type_label = ttk.Label(self.entry_frame, text="Membership Type:")
+        self.membership_type_combobox = ttk.Combobox(self.entry_frame, values=["Basic", "Premium", "VIP"])
 
         self.add_button = ttk.Button(self.entry_frame, text="Add Membership", command=self.add_membership)
         
@@ -79,32 +83,36 @@ class MembershipGUI:
         self.display_frame.columnconfigure(0, weight=1)
 
         # Grid placement
-        self.name_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        self.name_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.username_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.username_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         self.age_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.age_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.email_label.grid(row=2, column=0, padx=5, pady=5, sticky="e")
         self.email_entry.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
-        self.add_button.grid(row=3, column=0, columnspan=2, pady=10)
-
+        self.membership_type_label.grid(row=3, column=0, padx=5, pady=5, sticky='e')
+        self.membership_type_combobox.grid(row=3, column=1, padx=5, pady=5, sticky='ew')
+        self.add_button.grid(row=4, column=0, columnspan=2, pady=10)
+    
         self.display_text.grid(row=0, column=0)
 
     def add_membership(self): 
-        name = self.name_entry.get() # gets text entered by user
+        username = self.username_entry.get() # gets text entered by user
         age = self.age_entry.get()
         email = self.email_entry.get()
+        membership_type = self.membership_type_combobox.get()
 
         # data validation
-        if self.validate_input(name, age, email):
-            self.climbing_club.add_membership(name, age, email)  # passes the values entered to the method and add the details to the db
+        if self.validate_input(username, age, email):
+            self.climbing_club.add_membership(username, age, email, membership_type)  # passes the values entered to the method and add the details to the db
             self.clear_entry_fields()  # to clear text entry fields
+            self.membership_type_combobox.set("")
             tk.messagebox.showinfo("Success", "Membership successfully added!")
         else:
             tk.messagebox.showerror("Error", "Invalid input!")
     
-    def validate_input(self, name, age, email):
-        # name should not be empty
-        if not name:
+    def validate_input(self, username, age, email):
+        # username should not be empty
+        if not username:
             return False
         
         # age should be positive int
@@ -127,7 +135,7 @@ class MembershipGUI:
         self.display_text.delete("1.0", tk.END)
 
         for member in memberships: # iterates over each memebrship
-            self.display_text.insert(tk.END, f"Name: {member[1]}\n")
+            self.display_text.insert(tk.END, f"Username: {member[1]}\n")
             self.display_text.insert(tk.END, f"Age: {member[2]}\n")
             self.display_text.insert(tk.END, f"Email: {member[3]}\n")
         
@@ -135,13 +143,13 @@ class MembershipGUI:
 
     
     def clear_entry_fields(self):
-        self.name_entry.delete(0, tk.END)
+        self.username_entry.delete(0, tk.END)
         self.age_entry.delete(0, tk.END)
         self.email_entry.delete(0, tk.END)
 
     def clear_all_memberships(self):
         self.climbing_club.clear_all_memberships()
-        self.name_entry.config(state="normal")
+        self.username_entry.config(state="normal")
         self.age_entry.delete(0, tk.END)
         self.email_entry.config(state="disabled")
         self.display_membership_details()
