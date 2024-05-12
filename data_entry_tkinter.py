@@ -20,9 +20,9 @@ class RockClimbingClub:
                   )''')
         self.conn.commit()
    
-    def add_membership(self, username, age, email, memebership_type): # adds new membership
+    def add_membership(self, username, age, email, membership_type): # adds new membership
         c = self.conn.cursor()
-        c.execute ("INSERT INTO memberships (username, age, email, membership_type) VALUES (?,?,?,?)", (username, age, email, memebership_type)) #adds new rows to membership table
+        c.execute ("INSERT INTO memberships (username, age, email, membership_type) VALUES (?,?,?,?)", (username, age, email, membership_type)) #adds new rows to membership table
         self.conn.commit()  # commit changes to database
 
     def get_membership_details(self):  # retrieves all methods
@@ -34,6 +34,48 @@ class RockClimbingClub:
         c =self.conn.cursor()
         c.execute("DELETE FROM memberships")
         self.conn.commit()
+    
+    def create_views(self):
+        c = self.conn.cursor()
+
+        # view to get the total number of members
+        c.execute('''CREATE VIEW IF NOT EXISTS total_members AS
+                  SELECT COUNT(*) AS total_members FROM memberships''')
+
+        # view to get the average age of members
+        c.execute('''CREATE VIEW IF NOT EXISTS average_age AS
+                  SELECT AVG(age) AS avg_age FROM memberships''')
+
+        # view to get count of members by membership type
+        c.execute('''CREATE VIEW IF NOT EXISTS membership_type_counts AS
+                  SELECT membership_type, COUNT(*) AS counts FROM memberships GROUP BY membership_type''')
+
+        # view to get latest memebrs joined
+        c.execute('''CREATE VIEW IF NOT EXISTS latest_memebrs AS
+                  SELECT * FROM memberships ORDER BY id DESC LIMIT 10''')
+        
+        self.conn.commit()
+
+    def get_total_members(self):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM total_members")
+        return c.fetchone()[0]
+    
+    def get_average_age(self):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM average_age")
+        return c.fetchone()[0]
+    
+    def get_membership_type_counts(self):
+        c = self.conn.cursor()
+        c.execute("SELECT membership_type, COUNT(*) FROM memberships GROUP BY membership_type")
+        return c.fetchall()
+    
+    def get_latest_memebrs(self):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM memberships ORDER BY id DESC LIMIT 5")
+        return c.fetchall()
+
 class MembershipGUI:
     def __init__(self, root):
         self.root = root
@@ -168,4 +210,27 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = MembershipGUI(root)
     root.mainloop()
+
+    # Utilize views to obtain insights
+    climbing_club = RockClimbingClub()
+
+    # Create views
+    climbing_club.create_views()
+    climbing_club.create_table()
+
+
+    total_members = climbing_club.get_total_members()
+    print("Total Members:", total_members)
+    
+    average_age = climbing_club.get_average_age()
+    print("Average Age of Members:", average_age)
+
+    membership_type_counts = climbing_club.get_membership_type_counts()
+    print("Membership Type Counts:", membership_type_counts)#
+
+    latest_members = climbing_club.get_latest_memebrs()
+    print("Latest Members:")
+    
+    for member in latest_members:
+        print(member)
 
