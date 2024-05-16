@@ -1,46 +1,36 @@
-# Data Entry 
+# Data Entry: Rock Climbing Club Membership Database
 
-## Overview
+## Introduction
+This Python project is a Rock Climbing Club Membership Management System, designed to help manage membership details including usernames, ages, emails, and membership types. It utilizes the `tkinter` library for the graphical user interface, and `sqlite3` for database management. The system also incorporates database backup, logging, data validation, and data visualization using `matplotlib`.
 
-This Python application, built using the Tkinter library, provides a simple interface for managing memberships in a rock climbing club. It allows users to add, view, and clear memberships stored in a SQLite database.
+## Features
+- **Add Membership**: Users can add new memberships by providing username, age, email, and membership type details.
+- **Display Memberships**: Users can view all existing memberships stored in the database.
+- **Clear All Memberships**: Option to clear all memberships from the database.
+- **Automatic Backup**: The system automatically backs up the database at regular intervals.
+- **Data Insights**: Utilizes SQLite views to provide insights into membership data such as total members, average age, membership type counts, and latest members.
+- **GUI Interface**: Provides a user-friendly graphical interface using Tkinter for interaction.
 
-## Features 
 
-1. **Add Membership Details:**
-   - Users can input the name, age, and email address of new members through the provided entry fields.
-   - Input validation ensures that the entered data is valid before adding it to the database.
+## Dependencies
+- `tkinter`: For creating the graphical user interface.
+- `sqlite3`: Database management system for storing membership data.
+- `matplotlib`: For data visualization.
+- `re`: For email validation.
+- `os`, `shutil`: For file operations and directory management.
+- `datetime`: For working with date and time.
+- `logging`: For logging membership additions and other events.
 
-2. **Display Memberships:**
-   - Users can view all existing membership details stored in the database.
-   - Membership details are displayed in a text area within the application's interface.
+## Usage
+1. **Add Membership**: Enter username, age, email, and select membership type, then click "Add Membership".
+2. **View Memberships**: Click "View all" to display existing memberships.
+3. **Clear Memberships**: Click "Clear all" to delete all memberships.
+4. **Analytics**: Analytical insights can be obtained by running the script directly. Total members, average age, membership type counts, and latest members will be printed and a bar chart of membership type counts will be saved as an image (`membership_type_counts_plot.png`).
 
-3. **Clear All Memberships:**
-   - Allows users to remove all membership records from the database, effectively resetting the database.
+## How to Run
+1. Ensure Python is installed on your system.
+2. Run the script `membership.py` using Python.
+3. The GUI application will open. Interact with the application using the provided functionalities.
 
-## Requirements
-
-- Python 3.x
-- Tkinter library 
-- SQLite3
-
-## Installation:
-
-1. Clone or download the repository to your local machine.
-2. Ensure that Python and the required libraries are installed.
-3. Run the script `data_entry_tkinter.py` using Python.
-
-## Usage:
-
-1. Upon running the script, a GUI window titled "Rock Climbing Club Membership Database" will appear.
-2. Use the "Add Membership Details" section to enter the name, age, and email of new members.
-3. Click the "Add Membership" button to add the entered details to the database.
-4. Use the "View all" button under the "Menu" section to display all existing membership details.
-5. To clear all membership records, click the "Clear all" button under the "Menu" section.
-
-## License
-
-## Acknowledgments
-- This project was inspired from a pracice excercise found in the OCR Computer Science guide.
-
-## Contributions
-Contributions and feedback are welcome. Feel free to open an issue or submit a pull request.
+## Author
+This project was developed by Funmilola Olaitan.
